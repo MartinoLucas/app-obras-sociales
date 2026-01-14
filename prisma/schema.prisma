@@ -1,0 +1,84 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Professional {
+  id           String   @id @default(cuid())
+  apellido     String
+  nombre       String
+  matricula    String   @unique
+  dni          String
+  domicilio    String
+  localidadId  String
+  telefono     String
+  email        String   @unique
+  passwordHash String
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  localidad   Localidad                @relation(fields: [localidadId], references: [id])
+  obras       ProfessionalObraSocial[]
+  enrollments Enrollment[]
+  documents   Document[]
+}
+
+model ObraSocial {
+  id        String                   @id @default(cuid())
+  nombre    String                   @unique
+  obras     ProfessionalObraSocial[]
+  practices Practice[]
+}
+
+model ProfessionalObraSocial {
+  id             String   @id @default(cuid())
+  professionalId String
+  obraSocialId   String
+  createdAt      DateTime @default(now())
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+  obraSocial   ObraSocial   @relation(fields: [obraSocialId], references: [id])
+
+  @@unique([professionalId, obraSocialId])
+}
+
+model Practice {
+  id           String     @id @default(cuid())
+  nombre       String
+  obraSocialId String
+  obraSocial   ObraSocial @relation(fields: [obraSocialId], references: [id])
+}
+
+model Localidad {
+  id     String         @id @default(cuid())
+  nombre String         @unique
+  pros   Professional[]
+}
+
+model Enrollment {
+  id             String       @id @default(cuid())
+  professionalId String
+  year           Int
+  month          Int
+  kind           String // "enroll" | "unenroll"
+  createdAt      DateTime     @default(now())
+  professional   Professional @relation(fields: [professionalId], references: [id])
+
+  @@unique([professionalId, year, month, kind])
+}
+
+model Document {
+  id             String       @id @default(cuid())
+  professionalId String
+  kind           String // prestadores | mala_praxis | monotributo | habilitacion
+  url            String
+  uploadedAt     DateTime     @default(now())
+  professional   Professional @relation(fields: [professionalId], references: [id])
+
+  @@unique([professionalId, kind])
+}

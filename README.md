@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
+First, install the dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm i
+```
+
+Second, run the development server:
+
+```bash
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Folder Structure
 
-To learn more about Next.js, take a look at the following resources:
+src
+├─ domain
+│  ├─ entities.ts
+│  ├─ policies
+│  │  ├─ enrollmentPolicy.ts
+│  │  └─ documentPolicy.ts
+│  └─ ports
+│     ├─ repositories.ts
+│     └─ storage.ts
+├─ services
+│  ├─ authService.ts
+│  ├─ enrollmentService.ts
+│  ├─ documentService.ts
+│  └─ exportService.ts
+├─ infra
+│  ├─ prisma
+│  │  └─ client.ts
+│  ├─ repositories
+│  │  ├─ prismaProfessionalRepo.ts
+│  │  ├─ prismaEnrollmentRepo.ts
+│  │  ├─ prismaDocumentRepo.ts
+│  │  └─ prismaExportRepo.ts
+│  ├─ storage
+│  │  ├─ localStorageAdapter.ts
+│  │  └─ s3StorageAdapter.ts
+│  └─ export
+│     └─ csvExportAdapter.ts
+└─ app (Next.js)
+   └─ … (se detalla mas abajo)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+app
+├─ (public)
+│  └─ favicon.ico
+├─ (auth)
+│  ├─ login
+│  │  └─ page.tsx
+│  └─ register
+│     └─ page.tsx
+├─ (dashboard)
+│  ├─ layout.tsx
+│  └─ obras-sociales
+│     └─ page.tsx
+├─ actions
+│  ├─ auth.ts           // Server Actions: register, logout (si querés)
+│  └─ obras-sociales.ts // Server Action: updateObrasSociales
+├─ api
+│  ├─ session
+│  │  └─ route.ts       // POST login, DELETE logout
+│  └─ profesionales
+│     ├─ route.ts       // GET listado (admin) | POST crear (opcional)
+│     └─ [id]
+│        └─ approve
+│           └─ route.ts // PATCH aprueba profesional
+├─ layout.tsx
+├─ page.tsx
+└─ unauthorized.tsx      // (opcional) UX si usás unauthorized() experimental
+components
+├─ forms
+│  ├─ FormField.tsx
+│  └─ SubmitButton.tsx   // usa useFormStatus de React 19
+├─ nav
+│  └─ AppNav.tsx
+└─ ui
+   ├─ Card.tsx           // wrappers Tailwind (o reexport de shadcn/ui)
+   ├─ Button.tsx
+   └─ Input.tsx
+lib
+├─ auth.ts               // helpers cookie/session
+├─ db.ts                 // “persistencia” en memoria
+└─ validators.ts         // zod opcional; si no, validación nativa
+styles
+└─ globals.css           // @import "tailwindcss";
+types
+└─ index.ts
+middleware.ts            // si querés checks por path (opcional)
+next.config.ts
+postcss.config.js
+tailwind.css             // si preferís separar el @import + @theme
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying App
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Desarrollo (hot reload con bind mount)
+```bash
+# 1) levantar MySQL + app dev
+docker compose up -d mysql app-dev
+
+# 2) ver logs de la app
+docker compose logs -f app-dev
+```
+
+App en: http://localhost:3000
+
+MySQL en: mysql://app_user:app_pass@localhost:3306/app_obras (desde tu host)
+
+Prisma dentro del contenedor usa mysql como host (por .env.docker).
+
+Producción local (build y run optimizados)
+```bash
+# crea la imagen y levanta MySQL + app-prod
+docker compose up -d mysql app-prod
+
+# logs
+docker compose logs -f app-prod
+```
+
+
+docker compose down
+docker compose build --no-cache app-dev
+docker compose up -d mysql app-dev
+docker compose logs -f app-dev

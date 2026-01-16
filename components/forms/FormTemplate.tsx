@@ -43,6 +43,7 @@ type FormTemplateProps<TSchema extends AnyZodObject> = {
   submittingText?: string;
   resetText?: string;
   successToast?: string;
+  toastData?: any;
 
   children: (ctx: {
     form: UseFormReturn<ValuesOf<TSchema>>;
@@ -51,6 +52,8 @@ type FormTemplateProps<TSchema extends AnyZodObject> = {
 
   formId?: string;
   className?: string;
+
+  hasBackTo?: boolean;
 };
 
 export function FormTemplate<TSchema extends AnyZodObject>({
@@ -63,9 +66,11 @@ export function FormTemplate<TSchema extends AnyZodObject>({
   submittingText = "Enviando…",
   resetText = "Limpiar",
   successToast = "Listo.",
+  toastData,
   children,
   formId = "form-template",
   className,
+  hasBackTo = true,
 }: FormTemplateProps<TSchema>) {
   const [isPending, startTransition] = React.useTransition();
 
@@ -83,13 +88,13 @@ export function FormTemplate<TSchema extends AnyZodObject>({
       try {
         const maybeError = await onSubmit(values);
         if (typeof maybeError === "string" && maybeError.trim().length > 0) {
-          toast.error(maybeError);
+          toast.error(maybeError, toastData && toastData);
           return;
         }
-        toast.success(successToast);
+        toast.success(successToast, toastData && toastData);
         form.reset();
       } catch {
-        toast.error("Ocurrió un error inesperado.");
+        toast.error("Ocurrió un error inesperado.", toastData && toastData);
       }
     });
   };
@@ -102,12 +107,22 @@ export function FormTemplate<TSchema extends AnyZodObject>({
       }
     >
       <Card className="w-full p-6 md:p-8 shadow-lg bg-gray-50">
-        <CardHeader className="p-0 mb-4">
-          <CardTitle className="text-2xl md:text-3xl">{title}</CardTitle>
-          {description ? (
-            <CardDescription className="text-sm md:text-base">
-              {description}
-            </CardDescription>
+        <CardHeader className="p-0 mb-4 flex flex-row justify-between items-center">
+          <div>
+            <CardTitle className="text-2xl md:text-3xl">{title}</CardTitle>
+            {description ? (
+              <CardDescription className="text-sm md:text-base">
+                {description}
+              </CardDescription>
+            ) : null}
+          </div>
+          {hasBackTo ? (
+            <div className="mb-4">
+              <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                Volver
+              </Button>
+            </div>
           ) : null}
         </CardHeader>
 

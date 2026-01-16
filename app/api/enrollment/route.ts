@@ -1,3 +1,4 @@
+// app/api/enrollment/route.ts
 import { NextResponse } from 'next/server';
 import { EnrollmentService } from '@/services/enrollmentService';
 import { PrismaEnrollmentRepo } from '@/infra/repositories/prismaEnrollmentRepo';

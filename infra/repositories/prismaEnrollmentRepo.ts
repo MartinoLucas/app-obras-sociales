@@ -1,4 +1,4 @@
-import { prisma } from '../prisma/client';
+import prisma from '@/lib/prisma';
 import { IEnrollmentRepo } from '@/domain/ports/repositories';
 
 export class PrismaEnrollmentRepo implements IEnrollmentRepo {

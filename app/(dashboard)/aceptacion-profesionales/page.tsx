@@ -1,59 +1,47 @@
-"use client";
+// app/(dashboard)/aceptacion-profesionales/page.tsx
 
-import * as React from "react";
-import { DataTable, type ColumnDef } from "@/components/tables/DataTable";
-import { Button } from "@/components/ui/button";
-import { TableRow, TableCell } from "@/components/ui/table";
-import { toast } from "sonner";
+import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { PendingTable } from "./pending-table"; // Importamos el cliente
 
-type InvoiceRow = {
-  invoice: string;
-  paymentStatus: "Paid" | "Pending" | "Unpaid";
-  totalAmount: string;
-  paymentMethod: string;
-};
+export default async function AdminPage() {
+  const userId = await getSession();
 
-const invoices: InvoiceRow[] = [
-  { invoice: "INV001", paymentStatus: "Paid", totalAmount: "$250.00", paymentMethod: "Credit Card" },
-  { invoice: "INV002", paymentStatus: "Pending", totalAmount: "$150.00", paymentMethod: "PayPal" },
-  // ...
-];
+  // 1. Verificar sesión
+  if (!userId) {
+    redirect("/login");
+  }
+  
+  // 2. Buscar al usuario admin
+  const user = await prisma.professional.findUnique({
+    where: { id: userId }
+  });
 
-const columns: ColumnDef<InvoiceRow>[] = [
-  { id: "invoice", header: "Invoice", widthClassName: "w-[140px]", cell: (r) => <span className="font-medium">{r.invoice}</span> },
-  { id: "status", header: "Status", cell: (r) => r.paymentStatus },
-  { id: "method", header: "Method", cell: (r) => r.paymentMethod, hideOnMobile: true },
-  { id: "amount", header: <span className="inline-block w-full text-right">Amount</span>, align: "right", cell: (r) => r.totalAmount },
-];
+  // 3. Verificar rol
+  if (!user || user.role !== 'admin') {
+    return redirect('/dashboard');
+  }
 
-export default function TableDemo() {
+  // 4. Buscar pendientes REALES en la DB
+  const pendingPros = await prisma.professional.findMany({
+    where: { status: 'pending' },
+    select: { // Seleccionamos solo lo que necesita la tabla
+      id: true,
+      nombre: true,
+      apellido: true,
+      matricula: true,
+      email: true,
+      status: true
+    }
+  });
+
   return (
-    <DataTable
-      title="Recent invoices"
-      description="A list of your recent invoices."
-      caption="A list of your recent invoices."
-      data={invoices}
-      columns={columns}
-      getRowKey={(r) => r.invoice}
-      enableSearch
-      searchPlaceholder="Buscar por invoice, status, método..."
-      searchAccessor={(row) =>
-        `${row.invoice} ${row.paymentStatus} ${row.paymentMethod} ${row.totalAmount}`
-      }
-      headerActions={
-        <>
-          <Button variant="outline" onClick={() => toast.success("Exportando...")}>
-            Exportar
-          </Button>
-          <Button onClick={() => toast.success("Creando nueva factura...")}>Nueva factura</Button>
-        </>
-      }
-      footer={
-        <TableRow>
-          <TableCell colSpan={3} className="font-medium">Total</TableCell>
-          <TableCell className="text-right font-semibold">$2,500.00</TableCell>
-        </TableRow>
-      }
-    />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Panel de Administración</h1>
+      
+      {/* 5. Pasamos los datos de la DB al componente Cliente */}
+      <PendingTable data={pendingPros} />
+    </div>
   );
 }

@@ -1,10 +1,13 @@
+generator client {
+  provider      = "prisma-client-js"
+  // "native" usa el OS actual, "debian-openssl-1.1.x" asegura compatibilidad con la imagen node:bullseye-slim
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  output        = "../generated/client"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model Professional {
@@ -26,6 +29,8 @@ model Professional {
   obras       ProfessionalObraSocial[]
   enrollments Enrollment[]
   documents   Document[]
+
+  role           String   @default("user") // Puede ser "admin" o "user"
 }
 
 model ObraSocial {

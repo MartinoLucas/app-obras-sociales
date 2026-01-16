@@ -1,9 +1,12 @@
 'use server';
 
-import { prisma } from '@/infra/prisma/client';
-import { hash } from 'bcrypt';
+import prisma from '@/lib/prisma';
+import { hash, compare } from 'bcrypt'; // 1. Agregamos compare
+import { setSession } from '@/lib/auth'; // 2. Importamos setSession
+import { redirect } from 'next/navigation'; // 3. Importamos redirect
 
 export async function registerProfessional(_: unknown, form: FormData) {
+  // ... (Tu código de registro estaba bien, déjalo igual) ...
   const apellido   = String(form.get('apellido') || '').trim();
   const nombre     = String(form.get('nombre') || '').trim();
   const matricula  = String(form.get('matricula') || '').trim();
@@ -21,7 +24,6 @@ export async function registerProfessional(_: unknown, form: FormData) {
   const exists = await prisma.professional.findFirst({ where: { OR: [{ email }, { matricula }] } });
   if (exists) return 'Ya existe un profesional con ese email o matrícula';
 
-  // crea (o reusa) la Localidad
   const loc = await prisma.localidad.upsert({
     where: { nombre: localidad },
     create: { nombre: localidad },
@@ -37,7 +39,7 @@ export async function registerProfessional(_: unknown, form: FormData) {
     }
   });
 
-  return null; // OK
+  return null;
 }
 
 export async function loginProfessional(_: unknown, form: FormData) {
@@ -48,18 +50,27 @@ export async function loginProfessional(_: unknown, form: FormData) {
     return 'Completá todos los campos';
   }
 
+  // 1. Buscamos al usuario
   const professional = await prisma.professional.findUnique({ where: { email } });
-  if (!professional) {
+  
+  // 2. Verificamos Usuario Y Contraseña (bcrypt.compare)
+  if (!professional || !(await compare(password, professional.passwordHash))) {
     return 'Email o contraseña incorrectos';
   }
 
-  // Aquí debería verificarse la contraseña (omito para simplificar)
-
+  // 3. Verificamos estado
   if (professional.status !== 'active') {
     return 'Tu cuenta no está activa. Contactate con el administrador.';
   }
 
-  // Aquí debería crearse la sesión del usuario (omito para simplificar)
+  // 4. ✅ ESTO FALTABA: Crear la sesión (Cookie)
+  await setSession(professional.id);
 
-  return null; // OK
+  // 5. ✅ ESTO FALTABA: Redirigir según el rol
+  // (Nota: El redirect lanza un error interno de Next.js para navegar, por eso va al final)
+  if (professional.role === 'admin') {
+    redirect('/aceptacion-profesionales'); // O tu ruta de admin
+  } else {
+    redirect('/dashboard'); // Ruta para usuarios normales
+  }
 }

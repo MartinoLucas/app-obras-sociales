@@ -1,4 +1,4 @@
-import { prisma } from '../prisma/client';
+import prisma from '@/lib/prisma';
 import { IProfessionalRepo } from '@/domain/ports/repositories';
 
 export class PrismaProfessionalRepo implements IProfessionalRepo {

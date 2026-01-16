@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dependencies
+/.pnpm-store
+.pnpm-store/
+
+# next.js
+/.next/
+/out/
+
+# generated prisma
+/generated/

@@ -9,6 +9,7 @@ import { FieldGroup } from "@/components/ui/field";
 import { TextField } from "@/components/forms/fields/TextField";
 import { TextareaField } from "@/components/forms/fields/TextareaField";
 import { toFormData } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 // -------------------- Schema --------------------
 const formSchema = z
@@ -39,6 +40,9 @@ type FormInput = z.input<typeof formSchema>;
 type FormOutput = z.output<typeof formSchema>;
 
 export default function RegisterPage() {
+
+  const router = useRouter();
+
   return (
     <FormTemplate
       schema={formSchema}
@@ -59,9 +63,11 @@ export default function RegisterPage() {
       }}
       submitText="Crear cuenta"
       successToast="Registro enviado. Queda pendiente de aprobación."
+      toastData={{ duration: 10000 }}
       onSubmit={async (values: FormOutput) => {
         const msg = await registerProfessional(null, toFormData(values as any));
         if (msg) return msg; // FormTemplate lo muestra como toast.error
+        router.push("/");
       }}
     >
       {({ form }) => (

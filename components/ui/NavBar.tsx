@@ -27,7 +27,7 @@ export default function NavBar() {
 
     // Detectar si estamos en zona admin o user (esto es una mejora visual, la seguridad real está en el layout/middleware)
     const isAdminRoute = pathname.startsWith("/aceptacion-profesionales") || pathname.startsWith("/admin");
-    const isUserRoute = pathname.startsWith("/inscripcion") || pathname.startsWith("/documentos") || pathname.startsWith("/dashboard");
+    const isUserRoute = pathname.startsWith("/perfil") || pathname.startsWith("/documentos") || pathname.startsWith("/dashboard");
 
     if (isAdminRoute) {
         navLinks = [
@@ -38,7 +38,7 @@ export default function NavBar() {
         ];
     } else if (isUserRoute) {
         navLinks = [
-            { href: "/inscripcion", label: "Inscripción Mensual" },
+            { href: "/perfil", label: "Perfil" },
             { href: "/documentos", label: "Legajo Digital" },
         ];
     } else {
@@ -51,11 +51,15 @@ export default function NavBar() {
         <header className="flex flex-col w-full animate-slide-down sticky top-0 z-50">
             {/* LOGO AREA */}
             <div className="bg-white px-6 py-4 flex items-center gap-4 border-b border-gray-100 shadow-sm relative z-20">
-                <div className="h-10 w-auto relative">
-                     {/* Placeholder si no carga la imagen */}
-                    <div className="flex items-center font-bold text-xl tracking-tight">
-                        <span className="text-blue-600 mr-2">Ψ</span> Colegio
-                    </div>
+                <div className="h-12 w-auto relative">
+                    <Image 
+                        src="/logo.png" 
+                        alt="Logo del Colegio de Psicólogos" 
+                        width={988} 
+                        height={179} 
+                        className="h-full w-auto object-contain"
+                        priority 
+                    />
                 </div>
                 <div className="flex flex-col">
                     <h1 className="text-lg font-bold text-gray-800 leading-tight">

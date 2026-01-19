@@ -54,6 +54,15 @@ type FormTemplateProps<TSchema extends AnyZodObject> = {
   className?: string;
 
   hasBackTo?: boolean;
+  backToLink?: string;
+
+  /** * Acciones extra para mostrar en la cabecera 
+   * (ej: Botones de Editar, Borrar, Exportar) 
+   */
+  headerActions?: ReactNode;
+
+  /** Modo solo lectura: deshabilita los botones de submit/reset */
+  readonly?: boolean;
 };
 
 export function FormTemplate<TSchema extends AnyZodObject>({
@@ -71,6 +80,9 @@ export function FormTemplate<TSchema extends AnyZodObject>({
   formId = "form-template",
   className,
   hasBackTo = true,
+  backToLink,
+  headerActions, // ✅ Recibimos la prop aquí
+  readonly = false,
 }: FormTemplateProps<TSchema>) {
   const [isPending, startTransition] = React.useTransition();
 
@@ -92,7 +104,9 @@ export function FormTemplate<TSchema extends AnyZodObject>({
           return;
         }
         toast.success(successToast, toastData && toastData);
-        form.reset();
+        // Nota: En algunos casos no querrás resetear si estás editando un perfil, 
+        // pero el comportamiento default es resetear.
+        form.reset(values); 
       } catch {
         toast.error("Ocurrió un error inesperado.", toastData && toastData);
       }
@@ -107,23 +121,40 @@ export function FormTemplate<TSchema extends AnyZodObject>({
       }
     >
       <Card className="w-full p-6 md:p-8 shadow-lg bg-gray-50">
-        <CardHeader className="p-0 mb-4 flex flex-row justify-between items-center">
-          <div>
-            <CardTitle className="text-2xl md:text-3xl">{title}</CardTitle>
-            {description ? (
-              <CardDescription className="text-sm md:text-base">
-                {description}
-              </CardDescription>
-            ) : null}
-          </div>
-          {hasBackTo ? (
-            <div className="mb-4">
-              <Button type="button" variant="outline" onClick={() => window.history.back()}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-                Volver
-              </Button>
+        <CardHeader className="p-0 mb-4 space-y-3">
+          {/* ✅ LAYOUT DEL HEADER ACTUALIZADO */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            
+            {/* Izquierda: Título y Descripción */}
+            <div>
+              <CardTitle className="text-2xl md:text-3xl">{title}</CardTitle>
+              {description ? (
+                <CardDescription className="text-sm md:text-base mt-1">
+                  {description}
+                </CardDescription>
+              ) : null}
             </div>
-          ) : null}
+
+            {/* Derecha: Acciones y Botón Volver */}
+            {(headerActions || hasBackTo) && (
+              <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
+                
+                {/* Aquí se renderizan tus botones personalizados (Editar, Baja, etc) */}
+                {headerActions}
+
+                {hasBackTo ? (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={backToLink ? () => window.location.href = backToLink : () => window.history.back()}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left mr-2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    Volver
+                  </Button>
+                ) : null}
+              </div>
+            )}
+          </div>
         </CardHeader>
 
         <CardContent>
@@ -132,21 +163,23 @@ export function FormTemplate<TSchema extends AnyZodObject>({
           </form>
         </CardContent>
 
-        <CardFooter>
-          <Field orientation="horizontal" className="justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-              disabled={isPending}
-            >
-              {resetText}
-            </Button>
-            <Button type="submit" form={formId} disabled={isPending}>
-              {isPending ? submittingText : submitText}
-            </Button>
-          </Field>
-        </CardFooter>
+        {!readonly && (
+          <CardFooter>
+            <Field orientation="horizontal" className="justify-end gap-3 w-full">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+                disabled={isPending}
+              >
+                {resetText}
+              </Button>
+              <Button type="submit" form={formId} disabled={isPending}>
+                {isPending ? submittingText : submitText}
+              </Button>
+            </Field>
+          </CardFooter>
+        )}
       </Card>
     </main>
   );

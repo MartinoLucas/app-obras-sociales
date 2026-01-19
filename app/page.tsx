@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Page() {
   return (
-    <main className="flex flex-col min-h-[calc(100vh-64px)] bg-gray-50">
+    <main className="flex flex-col min-h-[calc(90vh-64px)] bg-gray-50">
       {/* Hero Section */}
       <section className="flex-1 flex flex-col items-center justify-center text-center px-4 py-20 bg-white">
         <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 sm:text-6xl mb-6">

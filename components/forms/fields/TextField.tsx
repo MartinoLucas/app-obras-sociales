@@ -26,6 +26,8 @@ type TextFieldProps<T extends FieldValues> = {
   transform?: (raw: string) => string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   pattern?: string;
+
+  disabled?: boolean;
 };
 
 export function TextField<T extends FieldValues>({
@@ -41,6 +43,7 @@ export function TextField<T extends FieldValues>({
   transform,
   inputMode,
   pattern,
+  disabled,
 }: TextFieldProps<T>) {
   return (
     <Controller
@@ -53,6 +56,7 @@ export function TextField<T extends FieldValues>({
             {...field}
             id={id}
             type={type}
+            disabled={disabled}
             autoComplete={autoComplete}
             placeholder={placeholder}
             inputMode={inputMode}

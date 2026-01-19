@@ -10,6 +10,7 @@ import { FieldGroup } from "@/components/ui/field";
 import { TextField } from "@/components/forms/fields/TextField";
 import { TextareaField } from "@/components/forms/fields/TextareaField";
 import { toFormData } from "@/lib/utils";
+import Image from "next/image";
 
 // -------------------- Schema --------------------
 const formSchema = z
@@ -23,42 +24,55 @@ type FormOutput = z.output<typeof formSchema>;
 
 export default function LoginPage() {
   return (
-    <FormTemplate
-      schema={formSchema}
-      title="Ingreso"
-      description="Ingreso para profesionales y administradores."
-      defaultValues={{
-        email: "",
-        password: ""
-      }}
-      submitText="Ingresar"
-      successToast="Ingreso correcto."
-      onSubmit={async (values: FormOutput) => {
-        const msg = await loginProfessional(null, toFormData(values as any));
-        if (msg) return msg; // FormTemplate lo muestra como toast.error
-      }}
-      className="container mx-auto px-4 py-10 max-w-2xl"
-    >
-      {({ form }) => (
-        <FieldGroup className="grid grid-cols-1 gap-4">
-          <TextField
-            control={form.control}
-            name={"email"}
-            label="Correo electrónico"
-            id="reg-email"
-            type="email"
-            autoComplete="email"
+    <div className="h-screen flex flex-col justify-center items-center">
+      <div className="h-28 w-auto relative">
+          <Image 
+              src="/logo.png" 
+              alt="Logo del Colegio de Psicólogos" 
+              width={988} 
+              height={179} 
+              className="h-full w-auto object-contain"
+              priority 
           />
-          <TextField
-            control={form.control}
-            name={"password"}
-            label="Contraseña"
-            id="reg-password"
-            type="password"
-            autoComplete="password"
-          />
-        </FieldGroup>
-      )}
-    </FormTemplate>
+      </div>
+      <FormTemplate
+        schema={formSchema}
+        title="Ingreso"
+        description="Ingreso para profesionales y administradores."
+        defaultValues={{
+          email: "",
+          password: ""
+        }}
+        submitText="Ingresar"
+        successToast="Ingreso correcto."
+        onSubmit={async (values: FormOutput) => {
+          const msg = await loginProfessional(null, toFormData(values as any));
+          if (msg) return msg; // FormTemplate lo muestra como toast.error
+        }}
+        className="container mx-auto px-4 py-10 max-w-2xl"
+        backToLink="/"
+      >
+        {({ form }) => (
+          <FieldGroup className="grid grid-cols-1 gap-4">
+            <TextField
+              control={form.control}
+              name={"email"}
+              label="Correo electrónico"
+              id="reg-email"
+              type="email"
+              autoComplete="email"
+            />
+            <TextField
+              control={form.control}
+              name={"password"}
+              label="Contraseña"
+              id="reg-password"
+              type="password"
+              autoComplete="password"
+            />
+          </FieldGroup>
+        )}
+      </FormTemplate>
+    </div>
   );
 }

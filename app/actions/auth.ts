@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { hash, compare } from 'bcrypt'; // 1. Agregamos compare
-import { setSession } from '@/lib/auth'; // 2. Importamos setSession
+import { clearSession, setSession } from '@/lib/auth'; // 2. Importamos setSession
 import { redirect } from 'next/navigation'; // 3. Importamos redirect
 
 export async function registerProfessional(_: unknown, form: FormData) {
@@ -69,8 +69,14 @@ export async function loginProfessional(_: unknown, form: FormData) {
   // 5. ✅ ESTO FALTABA: Redirigir según el rol
   // (Nota: El redirect lanza un error interno de Next.js para navegar, por eso va al final)
   if (professional.role === 'admin') {
-    redirect('/aceptacion-profesionales'); // O tu ruta de admin
+    redirect('/admin/aceptacion-profesionales'); // O tu ruta de admin
   } else {
     redirect('/dashboard'); // Ruta para usuarios normales
   }
+}
+
+export async function logoutProfessional() {
+  // Aquí simplemente limpiamos la sesión
+  await clearSession();
+  redirect('/login');
 }

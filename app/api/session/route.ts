@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/infra/prisma/client';
+import prisma from '@/lib/prisma';
 import { compare } from 'bcrypt';
 import { setSession, clearSession } from '@/lib/auth';
 

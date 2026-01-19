@@ -9,7 +9,7 @@ import { FileField } from "@/components/forms/fields/FileField";
 import { uploadDocumentAction } from "@/app/actions/documents";
 import { DataTable, type ColumnDef } from "@/components/tables/DataTable";
 import { Button } from "@/components/ui/button";
-import { Download, FileText } from "lucide-react";
+import { Download, ExternalLink, FileText } from "lucide-react";
 
 // --- DICCIONARIO PARA NOMBRES LINDOS ---
 const KIND_LABELS: Record<string, string> = {
@@ -53,7 +53,13 @@ export default function DocumentsView({ initialData }: { initialData: DocumentRo
     {
       id: "date",
       header: "Fecha de Subida",
-      cell: (r) => <span className="text-gray-500">{new Date(r.uploadedAt).toLocaleDateString()}</span>,
+      cell: (r) => <span className="text-gray-500">
+        {new Date(r.uploadedAt).toLocaleDateString('es-AR', {
+             day: '2-digit', 
+             month: '2-digit', 
+             year: 'numeric' 
+          })}
+      </span>,
     },
     {
       id: "actions",
@@ -62,9 +68,9 @@ export default function DocumentsView({ initialData }: { initialData: DocumentRo
       cell: (r) => (
         <div className="flex justify-end">
           <Button variant="ghost" size="sm" asChild>
-            <a href={r.url} target="_blank" download rel="noopener noreferrer">
-              <Download className="w-4 h-4 mr-2" />
-              Descargar
+            <a href={r.url} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Ver
             </a>
           </Button>
         </div>

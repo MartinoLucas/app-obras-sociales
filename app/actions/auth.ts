@@ -71,7 +71,7 @@ export async function loginProfessional(_: unknown, form: FormData) {
   if (professional.role === 'admin') {
     redirect('/admin/aceptacion-profesionales'); // O tu ruta de admin
   } else {
-    redirect('/dashboard'); // Ruta para usuarios normales
+    redirect('/perfil'); // Ruta para usuarios normales
   }
 }
 

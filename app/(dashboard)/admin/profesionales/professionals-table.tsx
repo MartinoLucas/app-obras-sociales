@@ -49,7 +49,16 @@ export function ProfessionalTable({ data }: PendingTableProps) {
       id: "status",
       header: "Estado",
       align: "center",
-      cell: (r) => <span className="capitalize">{r.status == "pending" ? <p className="py-1 text-red-700 bg-red-300 rounded-2xl">Pendiente</p> : <p className="py-1 text-green-700 bg-green-300 rounded-2xl">Activo</p>}</span>,
+      cell: (r) => <span className="capitalize">{
+        (() => {
+          switch(r.status) {
+            case 'pending': return <p className="py-1 text-red-700 bg-red-300 rounded-2xl">Pendiente</p>;
+            case 'active': return <p className="py-1 text-green-700 bg-green-300 rounded-2xl">Activo</p>;
+            case 'inactive': return <p className="py-1 text-yellow-700 bg-yellow-300 rounded-2xl">Inactivo</p>;
+            default: return r.status;
+          }
+        })()
+      }</span>,
       hideOnMobile: true
     }
     // { 

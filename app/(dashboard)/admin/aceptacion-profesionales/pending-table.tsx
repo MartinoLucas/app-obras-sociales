@@ -65,7 +65,7 @@ export function PendingTable({ data }: PendingTableProps) {
                   toast.error("Ocurrió un error inesperado");
                 }
              }}>
-             Aceptar
+             {r.status === 'inactive' ? 'Reactivar' : 'Aceptar'}
            </Button>
            {/* <Button size="sm" variant="destructive" onClick={() => toast.error("Rechazando...")}>
              Rechazar

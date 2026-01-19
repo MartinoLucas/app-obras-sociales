@@ -25,7 +25,7 @@ export default async function AdminPage() {
 
   // 4. Buscar pendientes REALES en la DB
   const pendingPros = await prisma.professional.findMany({
-    where: { status: 'pending' },
+    where: { OR: [{ status: 'pending' }, {status: 'inactive'}] },
     select: { // Seleccionamos solo lo que necesita la tabla
       id: true,
       nombre: true,

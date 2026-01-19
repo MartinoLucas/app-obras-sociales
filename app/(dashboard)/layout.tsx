@@ -1,6 +1,8 @@
+// app/(dashboard)/layout.tsx
+// parcialmente comentado para trabajar de manera mas sencilla
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { prisma } from '@/infra/prisma/client';
+import prisma from '@/lib/prisma';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   // const jar = await cookies();

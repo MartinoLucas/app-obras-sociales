@@ -1,3 +1,4 @@
+// app/(dashboard)/inscripcion/page.tsx
 'use client';
 
 export default function InscripcionPage() {

@@ -1,6 +1,7 @@
 // app/actions/documents.ts
 "use server";
 
+import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { DocumentService } from "@/services/documentService";
 import { PrismaDocumentRepo } from "@/infra/repositories/prismaDocumentRepo";
@@ -30,4 +31,22 @@ export async function uploadDocumentAction(formData: FormData) {
   } catch (e: any) {
     return e.message || "Error al subir";
   }
+}
+
+export async function getUserDocuments() {
+  const userId = await getSession();
+  if (!userId) return [];
+
+  const docs = await prisma.document.findMany({
+    where: { professionalId: userId },
+    orderBy: { uploadedAt: 'desc' },
+    select: {
+      id: true,
+      kind: true,
+      url: true,
+      uploadedAt: true
+    }
+  });
+
+  return docs;
 }
